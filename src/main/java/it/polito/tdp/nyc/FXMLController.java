@@ -1,11 +1,11 @@
-/**
- * Sample Skeleton for 'Scene.fxml' Controller Class
- */
-
 package it.polito.tdp.nyc;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.nyc.model.Location;
 import it.polito.tdp.nyc.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,7 +34,7 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbProvider"
-    private ComboBox<?> cmbProvider; // Value injected by FXMLLoader
+    private ComboBox<String> cmbProvider; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtDistanza"
     private TextField txtDistanza; // Value injected by FXMLLoader
@@ -51,6 +51,12 @@ public class FXMLController {
     @FXML
     void doAnalisiGrafo(ActionEvent event) {
     	
+    	Map<Location, Integer> mappa = this.model.analizzaGrafo();
+		txtResult.appendText("\n");
+    	txtResult.appendText("VERTICI CON PIU' VICINI \n");
+
+    	for(Location l: mappa.keySet()) {
+    		txtResult.appendText(l.getLocation()+ ", - vicini: " + mappa.get(l)+"\n"); }	
     }
 
     @FXML
@@ -60,6 +66,25 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
+    	String x = txtDistanza.getText(); 
+    	String provider = cmbProvider.getValue(); 
+    	double x1 = 0; 
+    	try {
+    		x1 = Double.parseDouble(x); 
+    	
+    	}catch (NumberFormatException e) {
+    		txtResult.setText("Inserire un valore valido per la distanza minima! ");
+    		return; 
+    	}
+    	if(provider == null) {
+    		txtResult.setText("Scegliere un provider dalla tendina!");
+    	}else {
+    		this.model.creaGrafo(x1, provider);
+    		txtResult.setText("Grafo creato! \n");
+    		txtResult.appendText("- Vertici: " +this.model.nVertici()+ "\n");
+    		txtResult.appendText("- Archi: " + this.model.nArchi()+ "\n");
+    	}
     	
     }
 
@@ -77,5 +102,6 @@ public class FXMLController {
 
     public void setModel(Model model) {
     	this.model = model;
-    }
+    	List<String> providers = this.model.getAllProvider();
+     	cmbProvider.getItems().addAll(providers); 	 }
 }
